@@ -55,3 +55,22 @@ Caller Identity...
     "Arn": "arn:aws:sts::1234567890:assumed-role/foobar/foobar"
 }
 ```
+
+## Elastic Container Registry
+### Login to ECR & populate your docker config.json
+```
+$ if [[ "Darwin" == `uname -s` ]]
+    then security unlock-keychain
+  fi &&
+  aws ecr get-login-password --region ${AWS_DEFAULT_REGION:-us-east-1}| docker login --username AWS --password-stdin \
+  $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_DEFAULT_REGION:-us-east-1}.amazonaws.com
+```
+### Tag
+```
+$ docker tag <image>:<tag> $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_DEFAULT_REGION:-us-east-=}.amazonaws.com/<DESTINATION REPOSITORY>
+```
+
+### Push
+```
+$ docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_DEFAULT_REGION:-us-east-=}.amazonaws.com/<DESTINATION REPOSITORY>
+```
